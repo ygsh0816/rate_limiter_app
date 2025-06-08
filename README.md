@@ -15,7 +15,7 @@ The rate-limiting logic is implemented in two ways:
 
 ### Switching Between Implementations
 
-The `rate_limiter_routes.py` file defines the endpoints and their dependencies. You can switch between the Lua script-based implementation and the direct Redis client implementation by updating the dependencies in the route definitions.
+The `main.py` file defines the endpoints and their dependencies. You can switch between the Lua script-based implementation and the direct Redis client implementation by updating the dependencies in the route definitions.
 
 #### Example:
 
@@ -23,12 +23,13 @@ To use the **Lua script-based implementation**, update the dependencies as follo
 <pre>
 from ..dependencies import fixed_rate_limit_with_lua_script, sliding_log_rate_limit_with_lua_script
 
-@router.get("/fixed-limited", dependencies=[Depends(fixed_rate_limit_with_lua_script)])
+@app.get("/fixed-limited", dependencies=[Depends(fixed_rate_limit_with_lua_script)])
 async def get_fixed_limited_resource():
     return {"message": "You accessed the fixed-window limited resource!"}
 
-@router.get("/sliding-limited", dependencies=[Depends(sliding_log_rate_limit_with_lua_script)])
+@app.get("/sliding-limited", dependencies=[Depends(sliding_log_rate_limit_with_lua_script)])
 async def get_sliding_limited_resource():
+    return {"message": "You accessed the sliding-window-log limited resource!"}
 
 </pre>
 
@@ -36,11 +37,11 @@ To use the **direct Redis client implementation**, update the dependencies as fo
 <pre>
 from ..dependencies import fixed_rate_limit, sliding_log_rate_limit
 
-@router.get("/fixed-limited", dependencies=[Depends(fixed_rate_limit)])
+@app.get("/fixed-limited", dependencies=[Depends(fixed_rate_limit)])
 async def get_fixed_limited_resource():
     return {"message": "You accessed the fixed-window limited resource!"}
 
-@router.get("/sliding-limited", dependencies=[Depends(sliding_log_rate_limit)])
+@app.get("/sliding-limited", dependencies=[Depends(sliding_log_rate_limit)])
 async def get_sliding_limited_resource():
     return {"message": "You accessed the sliding-window-log limited resource!"}
 
