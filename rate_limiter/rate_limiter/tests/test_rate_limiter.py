@@ -1,8 +1,15 @@
 import pytest
 from fastapi.testclient import TestClient
 from app.main import app
+from app.config import redis_client  # Import your Redis client
 
 client = TestClient(app)
+
+@pytest.fixture(autouse=True)
+def clear_redis():
+    """Clear Redis keys before each test."""
+    print("Clearing Redis database...")
+    redis_client.flushdb()  # Clears all keys in the Redis database
 
 def test_read_root():
     response = client.get("/")
@@ -27,8 +34,6 @@ def test_fixed_limited_exceed_limit():
 
 def test_sliding_limited_exceed_limit():
     for _ in range(3):
-        print(_)
         client.get("/sliding-limited")
     response = client.get("/sliding-limited")
-    print(response.status_code)
     assert response.status_code == 429  # Assuming 429 Too Many Requests is returned

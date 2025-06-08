@@ -1,10 +1,39 @@
 from fastapi import Request, HTTPException
 from redis import Redis
+from .lua_scripts import fixed_rate_lua_script, sliding_log_lua_script
 import time
 
 # Initialize Redis client
 redis_client = Redis(host='localhost', port=6379, db=0)
 
+# Rate limiting functions using Lua scripts
+def fixed_rate_limit_with_lua_script(request: Request):
+    client_ip = request.client.host
+    current_time = int(time.time())
+    window_size = 10  # 10 seconds
+    limit = 5  # 5 requests
+
+    key = f"fixed_rate_limit:{client_ip}:{current_time // window_size}"
+    result = redis_client.eval(fixed_rate_lua_script, 1, key, window_size, limit)
+
+    if result == 0:
+        raise HTTPException(status_code=429, detail="Rate limit exceeded. Try again later.")
+
+
+def sliding_log_rate_limit_with_lua_script(request: Request):
+    client_ip = request.client.host
+    current_time = int(time.time())
+    window_size = 60  # 60 seconds
+    limit = 3  # 3 requests
+
+    key = f"sliding_log_rate_limit:{client_ip}"
+    result = redis_client.eval(sliding_log_lua_script, 1, key, current_time, window_size, limit)
+
+    if result == 0:
+        raise HTTPException(status_code=429, detail="Rate limit exceeded. Try again later.")
+
+
+# Rate limiting functions using Redis commands directly
 def fixed_rate_limit(request: Request):
     client_ip = request.client.host
     current_time = int(time.time())
@@ -23,6 +52,7 @@ def fixed_rate_limit(request: Request):
 
     if request_count > limit:
         raise HTTPException(status_code=429, detail="Rate limit exceeded. Try again later.")
+
 
 def sliding_log_rate_limit(request: Request):
     client_ip = request.client.host
