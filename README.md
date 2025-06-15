@@ -57,9 +57,8 @@ rate_limiter
 │   ├── main.py                # Entry point of the FastAPI application
 │   ├── dependencies.py        # Rate limiting logic
 │   ├── config.py             # Configuration settings and Redis client setup
-│   └── routes
-│       ├── __init__.py
-│       └── rate_limiter_routes.py # Defines rate limiting routes
+|   ├── lua_scripts.py        # Lua Scripts for Redis
+│    
 ├── tests
 │   ├── __init__.py
 │   └── test_rate_limiter.py   # Unit tests for rate limiting functionality
