@@ -1,0 +1,4 @@
+FastAPI
+uvicorn
+redis
+python-dotenv

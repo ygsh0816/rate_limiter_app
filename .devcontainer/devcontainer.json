@@ -1,0 +1,18 @@
+{
+    "name": "Python 3 with Redis",
+    "dockerComposeFile": "docker-compose.yml",
+    "service": "app",
+    "workspaceFolder": "/workspace",
+    "postCreateCommand": "pip install -r requirements.txt",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.python",
+                "ms-python.vscode-pylance",
+                "ms-azuretools.vscode-docker"
+            ]
+        }
+    },
+    "forwardPorts": [8000, 6379], // Expose FastAPI (8000) and Redis (6379)
+    "remoteUser": "vscode"
+}
